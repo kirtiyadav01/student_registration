@@ -52,7 +52,18 @@ public class registrationForm extends javax.swing.JFrame {
                 submitActionPerformed(evt);
             }
         });
+         back.setBackground(new java.awt.Color(51, 51, 51));
+        back.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        back.setForeground(new java.awt.Color(255, 255, 255));
+        back.setText("Clear");
+        back.setMargin(new java.awt.Insets(3, 14, 3, 14));
+        back.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backActionPerformed(evt);
+            }
+        });
 
+     
         clear.setBackground(new java.awt.Color(51, 51, 51));
         clear.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
         clear.setForeground(new java.awt.Color(255, 255, 255));
@@ -265,35 +276,76 @@ public class registrationForm extends javax.swing.JFrame {
         passingYear.setSelectedIndex(0);
         
     }//GEN-LAST:event_clearActionPerformed
+ private void backActionPerformed(java.awt.event.ActionEvent evt) {                                     
+       startWindow s = new startWindow();
+       s.setVisible(true);
+       this.dispose();
+    }     
 
     private void submitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitActionPerformed
-       String name1 = name.getText();
-       String phonenumber = phone.getText();
-       String emailid = email.getText();
-        String gender1;
-        String date1 = (String)date.getValue();
-        String month1 = (String)month.getValue();
-        String year1 = (String)year.getValue();
-        
-       if(male.isSelected()){
-           gender1 = "M";
-       }else if(female.isSelected()){
-          gender1 = "F";
-       }else if(other.isSelected()){
-           gender1 = "other";
-       }
+      name1 = name.getText();
+            phonenumber = phone.getText();
+            emailid = email.getText();
        
-    }//GEN-LAST:event_submitActionPerformed
+            course1 = (String)course.getSelectedItem();
+            yearofpassing = (String)passingYear.getSelectedItem();
+            String date1 = (String)date.getValue();
+            String month1 = (String)month.getValue();
+            String year1 = (String)year.getValue();
+            
+            if(male.isSelected()){
+                gender1 = "male";
+            }else if(female.isSelected()){
+                gender1 = "female";
+            }if(other.isSelected()){
+                gender1 = "other";
+            }
+        if(name1.isBlank() || phonenumber.isBlank() || emailid.isBlank()){
+          warning.setText("Filling all the entries is compulsory!");
+          warning.setForeground(Color.red);
+       }
+        else if(phonenumber.length()!= 10){
+        warning.setText("enter a valid phone number");
+        warning.setForeground(Color.red);
+        }
+        else if(!emailid.endsWith("@gmail.com")){
+            warning.setText("enter Valid email ending with '@gmail.com'");
+            warning.setForeground(Color.red);
+        }else{
+            warning.setText("registered Successfully!");
+            warning.setForeground(Color.green);
+             try{ 
+            Class.forName("com.mysql.cj.jdbc.Driver");  
+            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/student_registration?characterEncoding=UTF-8","root","");
+             if (con != null) {
+                    dob = year1 +"-"+month1 +"-"+date1;
+                    System.out.println("Connection to the database has been established.");
+                    Statement stmt = con.createStatement();
+                    String query = "INSERT INTO `student_details`(studentName, gender, birthDate, phoneNo, email, course, passingyear) VALUES (?,?,?,?,?,?,?);";
+                    PreparedStatement preparedStatement = con.prepareStatement(query);
+                     // Set the parameter values
+                     preparedStatement.setString(1,name1);
+                     preparedStatement.setString(2,gender1);
+                     preparedStatement.setString(3,dob);
+                     preparedStatement.setString(4,phonenumber);
+                     preparedStatement.setString(5,emailid);
+                     preparedStatement.setString(6,course1);
+                     preparedStatement.setString(7,yearofpassing);
+                     int rowsAffected = preparedStatement.executeUpdate();
+                     preparedStatement.close();
+                                     
+                                         
+             }
+            }catch(Exception e){
+               System.out.println(e);
+               }
+            
+        
+    }
 
-    /**
-     * @param args the command line arguments
-     */
+    
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -322,6 +374,7 @@ public class registrationForm extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clear;
+    private javax.swing.JButton back;
     private javax.swing.JComboBox<String> course;
     private javax.swing.JSpinner date;
     private javax.swing.JTextField email;
